@@ -1,13 +1,16 @@
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.InputSystem;
-public class PlayerController : MonoBehaviour
+public partial class PlayerController : MonoBehaviour
 {
+    [SerializeField] private ChannelPlayer sfxPlayer;
+    [SerializeField] private AudioClip footStepClip;
+
     [Header("Player Movement Properties")]
     [SerializeField] private float speed;
     [SerializeField] Vector2 movementInput;
 
-    [Header("Jumo Properties")]
+    [Header("Jump Properties")]
     [SerializeField] private float jumoForce;
     public bool canJump;
 
@@ -22,6 +25,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Color OnNotCollisionRay = Color.white;
 
     private Rigidbody _rigidbody;
+    private bool isMoving;
+    private float stepTimer;
+    [SerializeField] private float stepDelay = 0.4f;
 
     private void Awake()
     {
@@ -29,9 +35,21 @@ public class PlayerController : MonoBehaviour
     }
     private void Update()
     {
+
         Vector3 direction = new Vector3(movementInput.x, 0f, movementInput.y);
         transform.Translate(direction *  speed * Time.deltaTime);
 
+        isMoving = direction.magnitude > 0.1f;
+
+        if (isMoving )
+        {
+            stepTimer += Time.deltaTime;
+            if (stepTimer >= stepDelay )
+            {
+                PlayFootStep();
+                stepTimer = 0f;
+            }
+        }
         RaycastHit hit;
         if (Physics.Raycast(_origin.position, _direction, out hit, _distance, _layerInteraction))
         {
@@ -53,6 +71,13 @@ public class PlayerController : MonoBehaviour
         if(context.performed && canJump)
         {
             _rigidbody.AddForce(Vector3.up * jumoForce, ForceMode.Impulse);
+        }
+    }
+    private void PlayFootStep()
+    {
+        if(sfxPlayer != null && footStepClip != null)
+        {
+            sfxPlayer.PlayerClip(footStepClip);
         }
     }
 }
