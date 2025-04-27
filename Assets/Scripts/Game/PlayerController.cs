@@ -3,8 +3,9 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 public partial class PlayerController : MonoBehaviour
 {
+    [SerializeField] private AudioData audioData;
+    [SerializeField] private AudioSettings audioSettings;
     [SerializeField] private ChannelPlayer sfxPlayer;
-    [SerializeField] private AudioClip footStepClip;
 
     [Header("Player Movement Properties")]
     [SerializeField] private float speed;
@@ -32,6 +33,7 @@ public partial class PlayerController : MonoBehaviour
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody>();
+        Debug.Log(audioSettings);
     }
     private void Update()
     {
@@ -41,14 +43,18 @@ public partial class PlayerController : MonoBehaviour
 
         isMoving = direction.magnitude > 0.1f;
 
-        if (isMoving )
+        if (isMoving && canJump)
         {
             stepTimer += Time.deltaTime;
-            if (stepTimer >= stepDelay )
+            if (stepTimer >= stepDelay)
             {
                 PlayFootStep();
                 stepTimer = 0f;
             }
+        }
+        else
+        {
+            stepTimer = 0f; 
         }
         RaycastHit hit;
         if (Physics.Raycast(_origin.position, _direction, out hit, _distance, _layerInteraction))
@@ -75,9 +81,9 @@ public partial class PlayerController : MonoBehaviour
     }
     private void PlayFootStep()
     {
-        if(sfxPlayer != null && footStepClip != null)
+        if (sfxPlayer != null && audioData != null)
         {
-            sfxPlayer.PlayerClip(footStepClip);
+            sfxPlayer.PlayClip(audioData.AudioClip, false);
         }
     }
 }

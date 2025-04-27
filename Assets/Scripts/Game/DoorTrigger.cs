@@ -5,6 +5,8 @@ public class DoorTrigger : MonoBehaviour
     [Header("DoorTrigger Configuration")]
     [SerializeField] private string sceneToLoad;
     [SerializeField] private float delayBeforeLoad;
+    [SerializeField] private AudioClip doorSound;
+    [SerializeField] private ChannelPlayer channelPlayer;
 
     private bool hasTriggered = false;
 

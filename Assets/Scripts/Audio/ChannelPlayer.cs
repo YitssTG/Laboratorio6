@@ -4,27 +4,44 @@ public class ChannelPlayer : MonoBehaviour
 {
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioSettings audioSettings;
-
-    [Header("Music Start")]
-    [SerializeField] private bool playMusicOnStart = false;
-    [SerializeField] private AudioData audioData;
     public AudioMixerGroup PlayerChannel => audioSource.outputAudioMixerGroup;
     private void Awake()
     {
         audioSource.outputAudioMixerGroup = audioSettings.AudioMixerGroup;
         audioSource.loop = true;
     }
-    private void Start()
+    public void PlayClip(AudioClip clipToPlay, bool loop = true)
     {
-        if (playMusicOnStart && audioData !=null)
+        if (loop)
         {
-            PlayerClip(audioData.AudioClip);
+            audioSource.clip = clipToPlay;
+            audioSource.Play();
+        }
+        else
+        {
+            CreateTempAudioSource(clipToPlay);
         }
     }
-    public void PlayerClip(AudioClip clipToPlay)
+    public void StopClip()
     {
         audioSource.Stop();
-        audioSource.clip = clipToPlay;
+    }
+    public void ExitClip(AudioClip exitClip)
+    {
+        audioSource.loop = false;
+        audioSource.clip = exitClip;
         audioSource.Play();
+    }
+    private void CreateTempAudioSource(AudioClip clipToPlay)
+    {
+        GameObject tempAudio = new GameObject("TempAudioSource");
+        tempAudio.transform.position = transform.position;
+
+        AudioSource tempSource = tempAudio.AddComponent<AudioSource>();
+        tempSource.outputAudioMixerGroup = audioSettings.AudioMixerGroup;
+        tempSource.clip = clipToPlay;
+        tempSource.Play();
+
+        Destroy(tempAudio, clipToPlay.length);
     }
 }

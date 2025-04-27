@@ -7,6 +7,7 @@ public class AudioSlider : MonoBehaviour
     [SerializeField] private TMP_Text volumeText;
     [SerializeField] private AudioSettings audioSettingsData;
 
+
     private void OnEnable()
     {
         audioSettingsData.OnUpdateVolume += UpdateText;
